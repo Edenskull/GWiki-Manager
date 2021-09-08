@@ -2,11 +2,9 @@ var ss = SpreadsheetApp.getActiveSpreadsheet();
 
 function createLibrary(name, type, description) {
   var newSheet = ss.insertSheet("_LIB00_" + name);
-  var currentId = newSheet.getSheetId();
   var libSheet = ss.getSheetByName("Libraries_wiki_manager");
   var currentDate = new Date();
-  libSheet.appendRow([name, type, description, currentId, currentDate.toISOString()]);
-  return currentId;
+  libSheet.appendRow([newSheet.getSheetName(), name, type, description, currentDate.toISOString()]);
 }
 
 function getAllLibraries() {
@@ -18,10 +16,10 @@ function getAllLibraries() {
     var values = sheet.getSheetValues(2, 1, sheet.getLastRow() - 1, 5);
     values.forEach((value) => {
       result["libraries"].push({
-        "name": value[0],
-        "type": value[1],
-        "desc": value[2],
-        "googl_id": value[3],
+        "uniqueName": value[0],
+        "name": value[1],
+        "type": value[2],
+        "desc": value[3],
         "timestamp": value[4]
       });
     });
@@ -29,4 +27,13 @@ function getAllLibraries() {
     var result = null;
   }
   return result;
+}
+
+function deleteLibrary(uniqueName) {
+  var sheet = ss.getSheetByName("Libraries_wiki_manager");
+  ss.deleteSheet(ss.getSheetByName(uniqueName));
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1).getValues();
+  values = flatten(values);
+  var currentIndex = values.indexOf(uniqueName);
+  sheet.deleteRow(currentIndex + 2);
 }

@@ -11,3 +11,9 @@ function getAllTypes() {
 function getAllTimezones() {
   return UrlFetchApp.fetch("http://worldtimeapi.org/api/timezone").getAs('application/json');
 }
+
+function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  }, []);
+}

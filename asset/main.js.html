@@ -1,9 +1,9 @@
 <script>
+  var baseUrl = "https://script.google.com/macros/s/AKfycbx5AL3495XgTzr50RXx3gDt35MaTEYxGxQmgOkyMiw1/dev";
+
   $(document).ready(function(){
+    google.script.run.withSuccessHandler(providePageTitle).getPageTitle();
     google.script.run.withSuccessHandler(provideComboBox).getAllTypes();
-    google.script.run.withSuccessHandler(function(url) {
-      sessionStorage.setItem("baseUrl", url);
-    }).getUrlBase();
     google.script.run.withSuccessHandler(provideLibList).getAllLibraries();
     $("#createLib").click(function(event) {
       event.preventDefault();
@@ -11,8 +11,8 @@
       let type = $("#typeCombo").val();
       let description = $("#description").val();
       if(name != "" && name != null && name != undefined) {
-        google.script.run.withSuccessHandler(function(id) {
-          openPage("home", null);
+        google.script.run.withSuccessHandler(function() {
+          window.top.location = baseUrl;
         }).createLibrary(name, type, description);
       }
     });
@@ -24,6 +24,16 @@
     });
   }
 
+  function providePageTitle(pageTitle) {
+    $("#pageTitle").text(pageTitle);
+  }
+
+  function deleteLib(uniqueName) {
+    google.script.run.withSuccessHandler(function() {
+      window.top.location = baseUrl;
+    }).deleteLibrary(uniqueName)
+  }
+
   function provideLibList(vals) {
     $("#libBody").empty();
     if(vals == null) {
@@ -33,16 +43,8 @@
       $("#libTable").toggleClass("d-none");
       vals['libraries'].forEach(function(val) {
         var currentDate = new Date(val["timestamp"]);
-        $("#libBody").append('<tr><th scope="row">' + val["name"] + '</th><td>' + val["type"] + '</td><td>' + val["desc"] + '</td><td>' + currentDate.toGMTString() + '</td><td><i class="bi bi-pencil-fill me-2"></i><i class="bi bi-trash-fill"></i></td></tr>');
+        $("#libBody").append('<tr><th scope="row"><a href="' + baseUrl + "?page=currentLib&pageTitle=" + val["name"] + "&id=" + val["uniqueName"] + '">' + val["name"] + '</a></th><td>' + val["type"] + '</td><td>' + val["desc"] + '</td><td>' + currentDate.toGMTString() + '</td><td><i class="bi bi-pencil-fill me-3"></i><i class="bi bi-trash-fill cursor-hover" onClick=deleteLib("' + val["uniqueName"] + '")></i></td></tr>');
       });
-    }
-  }
-
-  function openPage(mode, param) {
-    if(param){
-      window.top.location = sessionStorage.getItem("baseUrl") + "?page=page/" + mode + "&id=" + param;
-    } else {
-      window.top.location = sessionStorage.getItem("baseUrl") + "?page=page/" + mode;
     }
   }
 </script>
