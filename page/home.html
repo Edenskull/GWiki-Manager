@@ -1,0 +1,47 @@
+<button type="button" class="btn btn-primary float-button position-fixed btn-lg" data-bs-toggle="modal" data-bs-target="#createLibModal">
+  <i class="bi bi-plus-lg"></i>
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="createLibModal" tabindex="-1" aria-labelledby="createLibModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createLibModalLabel">Create a new library</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="repoName" class="form-label">Library Name</label>
+          <input type="text" class="form-control" id="repoName">
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description of the library</label>
+          <textarea class="form-control" id="description" rows="3"></textarea>
+        </div>
+        <label for="typeCombo" class="form-label">Library Type</label>
+        <select id="typeCombo" class="form-select" aria-label="Default select example"></select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="createLib">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h1>Libraries</h1>
+<table class="table table-light table-bordered table-striped mt-3 d-none" id="libTable">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Type</th>
+      <th scope="col">Description</th>
+      <th scope="col">Creation Date</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="libBody"></tbody>
+</table>
+
+<h1 class="d-none text-warning" id="libPlaceholder">No libraries found in this project</h1>

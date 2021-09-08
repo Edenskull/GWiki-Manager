@@ -1,0 +1,48 @@
+<script>
+  $(document).ready(function(){
+    google.script.run.withSuccessHandler(provideComboBox).getAllTypes();
+    google.script.run.withSuccessHandler(function(url) {
+      sessionStorage.setItem("baseUrl", url);
+    }).getUrlBase();
+    google.script.run.withSuccessHandler(provideLibList).getAllLibraries();
+    $("#createLib").click(function(event) {
+      event.preventDefault();
+      let name = $("#repoName").val();
+      let type = $("#typeCombo").val();
+      let description = $("#description").val();
+      if(name != "" && name != null && name != undefined) {
+        google.script.run.withSuccessHandler(function(id) {
+          openPage("home", null);
+        }).createLibrary(name, type, description);
+      }
+    });
+  });
+
+  function provideComboBox(types) {
+    types.forEach(function(type) {
+      $("#typeCombo").append(new Option(type, type));
+    });
+  }
+
+  function provideLibList(vals) {
+    $("#libBody").empty();
+    if(vals == null) {
+      $("#libPlaceholder").toggleClass('d-none');
+    } else {
+      console.log(vals['libraries']);
+      $("#libTable").toggleClass("d-none");
+      vals['libraries'].forEach(function(val) {
+        var currentDate = new Date(val["timestamp"]);
+        $("#libBody").append('<tr><th scope="row">' + val["name"] + '</th><td>' + val["type"] + '</td><td>' + val["desc"] + '</td><td>' + currentDate.toGMTString() + '</td><td><i class="bi bi-pencil-fill me-2"></i><i class="bi bi-trash-fill"></i></td></tr>');
+      });
+    }
+  }
+
+  function openPage(mode, param) {
+    if(param){
+      window.top.location = sessionStorage.getItem("baseUrl") + "?page=page/" + mode + "&id=" + param;
+    } else {
+      window.top.location = sessionStorage.getItem("baseUrl") + "?page=page/" + mode;
+    }
+  }
+</script>
