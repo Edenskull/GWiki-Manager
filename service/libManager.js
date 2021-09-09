@@ -37,3 +37,9 @@ function deleteLibrary(uniqueName) {
   var currentIndex = values.indexOf(uniqueName);
   sheet.deleteRow(currentIndex + 2);
 }
+
+function editLibrary(uniqueName, params) {
+  var sheet = ss.getSheetByName(uniqueName);
+  sheet.getRange(1, 1, 1, sheet.getLastColumn());
+  sheet.getRange(1, 1, 1, params.lenght).setValues([params]);
+}

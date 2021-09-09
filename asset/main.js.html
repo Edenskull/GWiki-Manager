@@ -3,7 +3,6 @@
 
   $(document).ready(function(){
     google.script.run.withSuccessHandler(providePageTitle).getPageTitle();
-    google.script.run.withSuccessHandler(provideComboBox).getAllTypes();
     google.script.run.withSuccessHandler(provideLibList).getAllLibraries();
     $("#createLib").click(function(event) {
       event.preventDefault();
@@ -16,9 +15,28 @@
         }).createLibrary(name, type, description);
       }
     });
+    var editTypeModal = document.getElementById('editTypeModal')
+    editTypeModal.addEventListener('shown.bs.modal', function (event) {
+      $('#typeAddButton').prop("disabled", true);
+      google.script.run.withSuccessHandler(provideTypeForm).getAllTypes();
+    });
+    var createLibModal = document.getElementById('createLibModal')
+    createLibModal.addEventListener('shown.bs.modal', function (event) {
+      google.script.run.withSuccessHandler(provideComboBox).getAllTypes();
+    });
+    $("#saveType").click(function(event) {
+      event.preventDefault();
+      var vals = []
+      var inputs = $("#typeMode > div > input");
+      for(var i = 0; i < inputs.length; i++) {
+        vals.push($(inputs[i]).val())
+      }
+      google.script.run.withSuccessHandler().saveTypes(vals);
+    });
   });
 
   function provideComboBox(types) {
+    $("#typeCombo").empty();
     types.forEach(function(type) {
       $("#typeCombo").append(new Option(type, type));
     });
@@ -34,6 +52,24 @@
     }).deleteLibrary(uniqueName)
   }
 
+  function provideTypeForm(types) {
+    $("#typeMode").empty();
+    types.forEach(function(type, index) {
+      $("#typeMode").append(generateTypeInputHTML(type, index));
+    });
+    $("#typeMode").append('<div class="mb-3 d-grid gap-2"><button id="typeAddButton" class="btn btn-primary" type="button" onClick="addTypeSection(event)">Add type</button></div>');
+  }
+
+  function addTypeSection(event) {
+    event.preventDefault();
+    $("#typeMode div:last").before('<div class="mb-3"><input type="text" class="form-control"></div>');
+  }
+
+  function removeTypeSection(event, index) {
+    event.preventDefault();
+    $($("#typeMode div")[index]).remove();
+  }
+
   function provideLibList(vals) {
     $("#libBody").empty();
     if(vals == null) {
@@ -46,5 +82,14 @@
         $("#libBody").append('<tr><th scope="row"><a href="' + baseUrl + "?page=currentLib&pageTitle=" + val["name"] + "&id=" + val["uniqueName"] + '">' + val["name"] + '</a></th><td>' + val["type"] + '</td><td>' + val["desc"] + '</td><td>' + currentDate.toGMTString() + '</td><td><i class="bi bi-pencil-fill me-3"></i><i class="bi bi-trash-fill cursor-hover" onClick=deleteLib("' + val["uniqueName"] + '")></i></td></tr>');
       });
     }
+  }
+
+  function generateTypeInputHTML(type, index) {
+    return '<div class="input-group mb-3">' + 
+        '<input type="text" class="form-control" value="' + type + '">' +
+        '<button class="btn btn-outline-secondary" type="button" onClick="removeTypeSection(event, ' + index + ')">' +
+          '<i class="bi bi-dash"></i>' +
+        '</button>'
+      '</div>';
   }
 </script>
