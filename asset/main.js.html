@@ -10,9 +10,18 @@
       let type = $("#typeCombo").val();
       let description = $("#description").val();
       if(name != "" && name != null && name != undefined) {
-        google.script.run.withSuccessHandler(function() {
-          window.top.location = baseUrl;
+        google.script.run.withSuccessHandler(function(response) {
+          if(response.status == "success") {
+            toastr.success("Library has been created", "Library Manager")
+            setTimeout(function() {
+              window.top.location = baseUrl;
+            }, 3000);
+          } else {
+            toastr.error(response.message, "Library Manager")
+          }
         }).createLibrary(name, type, description);
+      } else {
+        toastr.error("Library can't have empty name. Please provide a name for the library", "Library Manager")
       }
     });
     var editTypeModal = document.getElementById('editTypeModal')
@@ -31,7 +40,13 @@
       for(var i = 0; i < inputs.length; i++) {
         vals.push($(inputs[i]).val())
       }
-      google.script.run.withSuccessHandler().saveTypes(vals);
+      google.script.run.withSuccessHandler(function(response) {
+        if(response.status == "success") {
+          toastr.success("Types have been saved", "Type Manager");
+        } else {
+          toastr.error(response.message, "Type Manager")
+        }
+      }).saveTypes(vals);
     });
   });
 
@@ -47,8 +62,13 @@
   }
 
   function deleteLib(uniqueName) {
-    google.script.run.withSuccessHandler(function() {
-      window.top.location = baseUrl;
+    google.script.run.withSuccessHandler(function(response) {
+      if(response.status == "success") {
+        toastr.success("Library has been deleted", "Library Manager")
+        setTimeout(function() {
+          window.top.location = baseUrl;
+        }, 3000);
+      }
     }).deleteLibrary(uniqueName)
   }
 
@@ -62,12 +82,20 @@
 
   function addTypeSection(event) {
     event.preventDefault();
-    $("#typeMode div:last").before('<div class="mb-3"><input type="text" class="form-control"></div>');
+    $("#typeMode div:last").before(generateTypeInputHTML("", $("#typeMode .input-group").length));
   }
 
   function removeTypeSection(event, index) {
     event.preventDefault();
-    $($("#typeMode div")[index]).remove();
+    google.script.run.withSuccessHandler(function(response) {
+      if(response > 0) {
+        let result = window.confirm(response + " Library use this type. Delete anyway (type will be replaced by default) ?");
+        if (result == false) {
+            return;
+        }
+      }
+      $($("#typeMode div")[index]).remove();
+    }).getLibNumberWithType($($("#typeMode div input")[index]).val());
   }
 
   function provideLibList(vals) {

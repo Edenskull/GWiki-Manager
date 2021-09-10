@@ -3,3 +3,7 @@ function flatten(arr) {
     return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
   }, []);
 }
+
+function checkForDuplicates(array) {
+  return new Set(array).size !== array.length
+}
